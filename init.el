@@ -16,7 +16,7 @@
  '(inhibit-startup-screen t)
  '(package-selected-packages
    (quote
-    (pylint flycheck 2048-game which-key try use-package pandoc-mode pandoc markdown-mode flymake-cursor elpy aggressive-indent)))
+    (pylint flycheck 2048-game which-key try use-package pandoc-mode pandoc markdown-mode flymake-cursor elpy)))
  '(show-paren-mode t)
  '(text-mode-hook (quote (turn-on-auto-fill text-mode-hook-identify)))
  '(tool-bar-mode nil)
@@ -82,10 +82,6 @@
   :init (setq markdown-command "multimarkdown"))
 (add-hook 'markdown-mode-hook 'pandoc-mode)
 
-
-;; aggressive-indent for all
-(global-aggressive-indent-mode 1)
-(add-to-list 'aggressive-indent-excluded-modes 'html-mode)
 
 ;; flycheck enable
 (add-hook 'after-init-hook #'global-flycheck-mode)
