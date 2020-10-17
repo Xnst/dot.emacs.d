@@ -85,12 +85,22 @@
 
 
 ;; flycheck enable
+(use-package flycheck
+  :ensure t)
 (add-hook 'after-init-hook #'global-flycheck-mode)
 
 ;; pylint enable
+(use-package pylint
+  :ensure t)
 (autoload 'pylint "pylint")
 (add-hook 'python-mode-hook 'pylint-add-menu-items)
 (add-hook 'python-mode-hook 'pylint-add-key-bindings)
+
+(use-package pandoc
+  :ensure t)
+
+(use-package pandoc-mode
+  :ensure t)
 
 
 ;; --- init for lisp-files in ~/.emacs.d/lisp
