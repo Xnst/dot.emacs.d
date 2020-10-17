@@ -1,3 +1,4 @@
+;; init.el file
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -16,7 +17,7 @@
  '(inhibit-startup-screen t)
  '(package-selected-packages
    (quote
-    (pylint flycheck 2048-game which-key try use-package pandoc-mode pandoc markdown-mode flymake-cursor elpy)))
+    (pylint flycheck 2048-game which-key try use-package pandoc-mode pandoc markdown-mode elpy)))
  '(show-paren-mode t)
  '(text-mode-hook (quote (turn-on-auto-fill text-mode-hook-identify)))
  '(tool-bar-mode nil)
