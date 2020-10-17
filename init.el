@@ -16,7 +16,7 @@
  '(inhibit-startup-screen t)
  '(package-selected-packages
    (quote
-    (2048-game which-key try use-package pandoc-mode pandoc markdown-mode flymake-cursor elpy aggressive-indent)))
+    (pylint flycheck 2048-game which-key try use-package pandoc-mode pandoc markdown-mode flymake-cursor elpy aggressive-indent)))
  '(show-paren-mode t)
  '(text-mode-hook (quote (turn-on-auto-fill text-mode-hook-identify)))
  '(tool-bar-mode nil)
@@ -87,7 +87,16 @@
 (global-aggressive-indent-mode 1)
 (add-to-list 'aggressive-indent-excluded-modes 'html-mode)
 
-;; --- stuff in .emacs.d/lisp
+;; flycheck enable
+(add-hook 'after-init-hook #'global-flycheck-mode)
+
+;; pylint enable
+(autoload 'pylint "pylint")
+(add-hook 'python-mode-hook 'pylint-add-menu-items)
+(add-hook 'python-mode-hook 'pylint-add-key-bindings)
+
+
+;; --- init for lisp-files in ~/.emacs.d/lisp
 ;; ----------------
 (add-to-list 'load-path "~/.emacs.d/lisp/")
 
