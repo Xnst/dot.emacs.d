@@ -1,4 +1,10 @@
-;; init.el file
+;;; init.el --- my own emacs init.el file
+
+;;; Commentary:
+;; 
+;;; Initialize:
+;;; Code:
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -86,8 +92,9 @@
 
 ;; flycheck enable
 (use-package flycheck
-  :ensure t)
-(add-hook 'after-init-hook #'global-flycheck-mode)
+  :ensure t
+  :init (global-flycheck-mode))
+;; (add-hook 'after-init-hook #'global-flycheck-mode)
 
 ;; pylint enable
 (use-package pylint
