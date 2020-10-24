@@ -23,7 +23,7 @@
  '(inhibit-startup-screen t)
  '(package-selected-packages
    (quote
-    (pylint flycheck 2048-game which-key try use-package pandoc-mode pandoc markdown-mode elpy)))
+    (sr-speedbar pylint flycheck 2048-game which-key try use-package pandoc-mode pandoc markdown-mode elpy)))
  '(show-paren-mode t)
  '(text-mode-hook (quote (turn-on-auto-fill text-mode-hook-identify)))
  '(tool-bar-mode nil)
@@ -108,6 +108,14 @@
 
 (use-package pandoc-mode
   :ensure t)
+
+
+(use-package sr-speedbar
+  :ensure t)
+;;(require 'sr-speedbar)
+(global-set-key "\C-cs" 'sr-speedbar-toggle)
+(setq speedbar-use-images nil)
+(setq sr-speedbar-refresh-turn-on t)
 
 
 ;; --- init for lisp-files in ~/.emacs.d/lisp
