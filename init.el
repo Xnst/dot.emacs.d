@@ -119,10 +119,21 @@
 (setq auto-mode-alist (cons '("\\.inp\\'" . abaqus-mode) auto-mode-alist))
 (add-hook 'abaqus-mode-hook 'font-lock-mode)
 
+
+
 ;; lsdyna
 (autoload 'lsdyna-mode "lsdyna" "Enter ls-dyna mode." t)
 (setq auto-mode-alist (cons '("\\.k\\'" . lsdyna-mode) auto-mode-alist))
 (add-hook 'lsdyna-mode-hook 'font-lock-mode)
+
+
+;; disable mouse clicking on laptop
+(require 'disable-mouse)
+(if (string-equal (system-name) "niclap")
+    (global-disable-mouse-mode))
+
+
+
 
 ;; octave uses matlab.el
 (setq auto-mode-alist (remq '("\\.m\\'" . objc-mode) auto-mode-alist))
