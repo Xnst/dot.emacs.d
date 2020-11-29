@@ -23,7 +23,7 @@
  '(inhibit-startup-screen t)
  '(package-selected-packages
    (quote
-    (sr-speedbar pylint flycheck 2048-game which-key try use-package pandoc-mode pandoc markdown-mode elpy)))
+    (visual-fill-column org org-bullets sr-speedbar pylint flycheck 2048-game which-key try use-package pandoc-mode pandoc markdown-mode elpy)))
  '(show-paren-mode t)
  '(text-mode-hook (quote (turn-on-auto-fill text-mode-hook-identify)))
  '(tool-bar-mode nil)
@@ -57,9 +57,10 @@
 ;; --- melpa packages settings
 ;; ----------------
 (require 'package)
-(setq package-enable-at-startup nil)
-(add-to-list 'package-archives
-	     '("melpa" . "https://melpa.org/packages/"))
+;; (setq package-enable-at-startup nil)
+(setq package-archives '(("melpa" . "https://melpa.org/packages/")
+                         ("org" . "https://orgmode.org/elpa/")
+                         ("elpa" . "https://elpa.gnu.org/packages/")))
 
 (package-initialize)
 
@@ -72,14 +73,17 @@
 (use-package try
   :ensure t)
 
+
 (use-package which-key
   :ensure t
   :config (which-key-mode))
+
 
 (use-package elpy
   :ensure t
   :init
   (elpy-enable))
+
 
 (use-package markdown-mode
   :ensure t
@@ -89,22 +93,9 @@
   :init (setq markdown-command "multimarkdown"))
 (add-hook 'markdown-mode-hook 'pandoc-mode)
 
-
-;; flycheck enable
-(use-package flycheck
-  :ensure t
-  :init (global-flycheck-mode))
-;; (add-hook 'after-init-hook #'global-flycheck-mode)
-
-;; pylint enable
-(use-package pylint
-  :ensure t)
-(autoload 'pylint "pylint")
-(add-hook 'python-mode-hook 'pylint-add-menu-items)
-(add-hook 'python-mode-hook 'pylint-add-key-bindings)
-
 (use-package pandoc
   :ensure t)
+
 
 (use-package pandoc-mode
   :ensure t)
@@ -117,7 +108,69 @@
 (setq speedbar-use-images nil)
 (setq sr-speedbar-refresh-turn-on t)
 
+;; ----------------
+;; Org Mode Configuration ------------------------------------------------------
+;; ----------------
 
+(defun ns/org-mode-setup ()
+  (org-indent-mode)
+  ;; (variable-pitch-mode 1)
+  ;; (visual-line-mode 1)
+  )
+
+;; (defun efs/org-font-setup ()
+;;   ;; Replace list hyphen with dot
+;;   (font-lock-add-keywords 'org-mode
+;;                           '(("^ *\\([-]\\) "
+;;                              (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
+
+  ;; Set faces for heading levels
+  (dolist (face '((org-level-1 . 1.2)
+                  (org-level-2 . 1.1)
+                  (org-level-3 . 1.05)
+                  (org-level-4 . 1.0)
+                  (org-level-5 . 1.1)
+                  (org-level-6 . 1.1)
+                  (org-level-7 . 1.1)
+                  (org-level-8 . 1.1)))
+    ;; (set-face-attribute (car face) nil :font "Cantarell" :weight 'regular :height (cdr face))
+    )
+
+  ;; ;; Ensure that anything that should be fixed-pitch in Org files appears that way
+  ;; (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
+  ;; (set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
+  ;; (set-face-attribute 'org-table nil   :inherit '(shadow fixed-pitch))
+  ;; (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
+  ;; (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
+  ;; (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+  ;; (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch))
+
+(use-package org
+  :hook (org-mode . ns/org-mode-setup)
+  :config
+   (setq org-ellipsis " ▾")
+   ;; (efs/org-font-setup)
+)
+
+(use-package org-bullets
+  :after org
+  :hook (org-mode . org-bullets-mode)
+  :custom
+  (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
+
+
+(defun ns/org-mode-visual-fill ()
+  (setq visual-fill-column-width 100
+        visual-fill-column-center-text t)
+  (visual-fill-column-mode 1))
+
+
+(use-package visual-fill-column
+  :hook (org-mode . ns/org-mode-visual-fill))
+
+;; --- END org-mode
+
+;; ----------------
 ;; --- init for lisp-files in ~/.emacs.d/lisp
 ;; ----------------
 (add-to-list 'load-path "~/.emacs.d/lisp/")
@@ -141,8 +194,6 @@
     (global-disable-mouse-mode))
 
 
-
-
 ;; octave uses matlab.el
 (setq auto-mode-alist (remq '("\\.m\\'" . objc-mode) auto-mode-alist))
 (autoload 'matlab-mode "matlab" "Enter MATLAB mode." t)
@@ -160,7 +211,6 @@
 (defun my-matlab-shell-mode-hook ()
   '())
 (add-hook 'matlab-shell-mode-hook 'my-matlab-shell-mode-hook)
-
 
 
 ;; ---
