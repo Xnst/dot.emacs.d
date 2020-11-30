@@ -1,7 +1,7 @@
 ;;; initMW.el --- my own emacs init.el file for running in -nw mode
 
 ;;; Commentary:
-;; 
+;;
 ;;; Initialize:
 ;;; Code:
 
@@ -50,17 +50,22 @@
 (global-set-key "\C-cw" 'ispell-word)
 (global-set-key "\C-ci" 'indent-region)
 (global-set-key "\C-cl" 'count-lines-region)
+(global-set-key "\C-cd" 'delete-trailing-whitespace)
 
 ;; --- tyst *scratch* buffer och inget pling
 (setq initial-scratch-message "")
 (setq ring-bell-function 'ignore)
 
+(add-hook 'before-save-hook
+          'delete-trailing-whitespace)
+
 ;; --- melpa packages settings
 ;; ----------------
 (require 'package)
-(setq package-enable-at-startup nil)
-(add-to-list 'package-archives
-	     '("melpa" . "https://melpa.org/packages/"))
+;; (setq package-enable-at-startup nil)
+(setq package-archives '(("melpa" . "https://melpa.org/packages/")
+                         ("org" . "https://orgmode.org/elpa/")
+                         ("elpa" . "https://elpa.gnu.org/packages/")))
 
 (package-initialize)
 
@@ -68,7 +73,7 @@
   (package-refresh-contents)
   (package-install 'use-package))
 
-;; --- the packages  
+;; --- the packages
 
 (use-package try
   :ensure t)
@@ -89,20 +94,6 @@
          ("\\.markdown\\'" . markdown-mode))
   :init (setq markdown-command "multimarkdown"))
 (add-hook 'markdown-mode-hook 'pandoc-mode)
-
-
-;; flycheck enable
-(use-package flycheck
-  :ensure t
-  :init (global-flycheck-mode))
-;; (add-hook 'after-init-hook #'global-flycheck-mode)
-
-;; pylint enable
-(use-package pylint
-  :ensure t)
-(autoload 'pylint "pylint")
-(add-hook 'python-mode-hook 'pylint-add-menu-items)
-(add-hook 'python-mode-hook 'pylint-add-key-bindings)
 
 (use-package pandoc
   :ensure t)
@@ -195,6 +186,3 @@
 ;; ---
 ;; ---
 ;; ---
-
-
-

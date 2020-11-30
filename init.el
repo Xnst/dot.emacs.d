@@ -1,7 +1,7 @@
 ;;; init.el --- my own emacs init.el file
 
 ;;; Commentary:
-;; 
+;;
 ;;; Initialize:
 ;;; Code:
 
@@ -49,10 +49,14 @@
 (global-set-key "\C-cw" 'ispell-word)
 (global-set-key "\C-ci" 'indent-region)
 (global-set-key "\C-cl" 'count-lines-region)
+(global-set-key "\C-cd" 'delete-trailing-whitespace)
 
 ;; --- tyst *scratch* buffer och inget pling
 (setq initial-scratch-message "")
 (setq ring-bell-function 'ignore)
+
+(add-hook 'before-save-hook
+          'delete-trailing-whitespace)
 
 ;; --- melpa packages settings
 ;; ----------------
@@ -68,7 +72,7 @@
   (package-refresh-contents)
   (package-install 'use-package))
 
-;; --- the packages  
+;; --- the packages
 
 (use-package try
   :ensure t)
@@ -263,4 +267,3 @@
 ;; ---
 ;; ---
 ;; ---
-
