@@ -23,7 +23,7 @@
  '(inhibit-startup-screen t)
  '(package-selected-packages
    (quote
-    (visual-fill-column org org-bullets sr-speedbar pylint flycheck 2048-game which-key try use-package pandoc-mode pandoc markdown-mode elpy)))
+    (better-defaults company-box visual-fill-column org org-bullets sr-speedbar elpy flycheck blacken 2048-game which-key try use-package pandoc-mode pandoc markdown-mode)))
  '(show-paren-mode t)
  '(text-mode-hook (quote (turn-on-auto-fill text-mode-hook-identify)))
  '(tool-bar-mode nil)
@@ -50,6 +50,7 @@
 (global-set-key "\C-ci" 'indent-region)
 (global-set-key "\C-cl" 'count-lines-region)
 (global-set-key "\C-cd" 'delete-trailing-whitespace)
+(global-set-key "\C-cp" 'org-toggle-inline-images)
 
 ;; --- tyst *scratch* buffer och inget pling
 (setq initial-scratch-message "")
@@ -74,6 +75,12 @@
 
 ;; --- the packages
 
+(use-package better-defaults
+  :ensure t
+  )
+(menu-bar-mode t)
+
+
 (use-package try
   :ensure t)
 
@@ -86,7 +93,29 @@
 (use-package elpy
   :ensure t
   :init
-  (elpy-enable))
+  (elpy-enable)
+  (when (require 'flycheck nil t)
+  (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
+  (add-hook 'elpy-mode-hook 'flycheck-mode))
+  :custom
+  (python-shell-interpreter "python3"))
+
+
+;; (use-package company
+;;   :after elpy-mode
+;;   :hook (elpy-mode . company-mode)
+;;   :bind (:map company-active-map
+;;          ("<tab>" . company-complete-selection))
+;;         (:map elpy-mode-map
+;;          ("<tab>" . company-indent-or-complete-common))
+;;   :custom
+;;   (company-minimum-prefix-length 1)
+;;   (company-idle-delay 0.0))
+
+;; (use-package company-box
+;;   :hook (company-mode . company-box-mode))
+
+;; ---
 
 
 (use-package markdown-mode
@@ -119,7 +148,7 @@
 (defun ns/org-mode-setup ()
   (org-indent-mode)
   ;; (variable-pitch-mode 1)
-  ;; (visual-line-mode 1)
+  (visual-line-mode 1)
   )
 
 ;; (defun efs/org-font-setup ()
@@ -152,7 +181,10 @@
 (use-package org
   :hook (org-mode . ns/org-mode-setup)
   :config
-   (setq org-ellipsis " ▾")
+  (setq org-ellipsis " ▾")
+  (setq org-todo-keywords
+  '((sequence "TODO" "DOING" "DONE")))
+
    ;; (efs/org-font-setup)
 )
 
@@ -174,6 +206,7 @@
 
 ;; --- END org-mode
 
+
 ;; ----------------
 ;; --- init for lisp-files in ~/.emacs.d/lisp
 ;; ----------------
@@ -190,6 +223,24 @@
 (autoload 'lsdyna-mode "lsdyna" "Enter ls-dyna mode." t)
 (setq auto-mode-alist (cons '("\\.k\\'" . lsdyna-mode) auto-mode-alist))
 (add-hook 'lsdyna-mode-hook 'font-lock-mode)
+
+;; org-present
+
+(autoload 'org-present "org-present" nil t)
+(eval-after-load "org-present"
+  '(progn
+     (add-hook 'org-present-mode-hook
+               (lambda ()
+                 (org-present-big)
+                 (org-display-inline-images)
+                 (org-present-hide-cursor)
+                 (org-present-read-only)))
+     (add-hook 'org-present-mode-quit-hook
+               (lambda ()
+                 (org-present-small)
+                 (org-remove-inline-images)
+                 (org-present-show-cursor)
+                 (org-present-read-write)))))
 
 
 ;; disable mouse clicking on laptop
