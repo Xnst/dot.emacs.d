@@ -23,7 +23,7 @@
  '(inhibit-startup-screen t)
  '(package-selected-packages
    (quote
-    (pylint flycheck 2048-game which-key try use-package pandoc-mode pandoc markdown-mode elpy)))
+    (better-defaults company-box visual-fill-column org org-bullets sr-speedbar elpy flycheck blacken 2048-game which-key try use-package pandoc-mode pandoc markdown-mode)))
  '(show-paren-mode t)
  '(text-mode-hook (quote (turn-on-auto-fill text-mode-hook-identify)))
  '(tool-bar-mode nil)
@@ -75,6 +75,13 @@
 
 ;; --- the packages
 
+(use-package better-defaults
+  :ensure t
+  )
+(menu-bar-mode t)
+
+
+
 (use-package try
   :ensure t)
 
@@ -85,7 +92,13 @@
 (use-package elpy
   :ensure t
   :init
-  (elpy-enable))
+  (elpy-enable)
+  (when (require 'flycheck nil t)
+  (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
+  (add-hook 'elpy-mode-hook 'flycheck-mode))
+  :custom
+  (python-shell-interpreter "python3"))
+
 
 (use-package markdown-mode
   :ensure t
@@ -101,6 +114,77 @@
 (use-package pandoc-mode
   :ensure t)
 
+(use-package sr-speedbar
+  :ensure t)
+;;(require 'sr-speedbar)
+(global-set-key "\C-cs" 'sr-speedbar-toggle)
+(setq speedbar-use-images nil)
+(setq sr-speedbar-refresh-turn-on t)
+
+;; ----------------
+;; Org Mode Configuration ------------------------------------------------------
+;; ----------------
+
+(defun ns/org-mode-setup ()
+  (org-indent-mode)
+  ;; (variable-pitch-mode 1)
+  ;; (visual-line-mode 1)
+  )
+
+;; (defun efs/org-font-setup ()
+;;   ;; Replace list hyphen with dot
+;;   (font-lock-add-keywords 'org-mode
+;;                           '(("^ *\\([-]\\) "
+;;                              (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
+
+  ;; Set faces for heading levels
+  (dolist (face '((org-level-1 . 1.2)
+                  (org-level-2 . 1.1)
+                  (org-level-3 . 1.05)
+                  (org-level-4 . 1.0)
+                  (org-level-5 . 1.1)
+                  (org-level-6 . 1.1)
+                  (org-level-7 . 1.1)
+                  (org-level-8 . 1.1)))
+    ;; (set-face-attribute (car face) nil :font "Cantarell" :weight 'regular :height (cdr face))
+    )
+
+  ;; ;; Ensure that anything that should be fixed-pitch in Org files appears that way
+  ;; (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
+  ;; (set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
+  ;; (set-face-attribute 'org-table nil   :inherit '(shadow fixed-pitch))
+  ;; (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
+  ;; (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
+  ;; (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+  ;; (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch))
+
+(use-package org
+  :hook (org-mode . ns/org-mode-setup)
+  :config
+  (setq org-ellipsis " ▾")
+  (setq org-todo-keywords
+  '((sequence "TODO" "DOING" "DONE")))
+
+   ;; (efs/org-font-setup)
+)
+
+(use-package org-bullets
+  :after org
+  :hook (org-mode . org-bullets-mode)
+  :custom
+  (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
+
+
+(defun ns/org-mode-visual-fill ()
+  (setq visual-fill-column-width 100
+        visual-fill-column-center-text t)
+  (visual-fill-column-mode 1))
+
+
+(use-package visual-fill-column
+  :hook (org-mode . ns/org-mode-visual-fill))
+
+;; --- END org-mode
 
 ;; --- init for lisp-files in ~/.emacs.d/lisp
 ;; ----------------
@@ -133,8 +217,6 @@
 (defun my-matlab-shell-mode-hook ()
   '())
 (add-hook 'matlab-shell-mode-hook 'my-matlab-shell-mode-hook)
-
-
 
 ;; ---
 ;; ---   shortcuts for insertion of chunks of text into tex files.
