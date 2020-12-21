@@ -35,7 +35,6 @@
  ;; If there is more than one, they won't work right.
  '(default ((t (:family "Consolas" :foundry "MS  " :slant normal :weight normal :height 90 :width normal)))))
 
-
 ;; ---------------
 ;; --- my personal settings
 ;; ---------------
@@ -141,6 +140,9 @@
 (setq speedbar-use-images nil)
 (setq sr-speedbar-refresh-turn-on t)
 
+(use-package texfrag
+  :ensure t)
+
 ;; ----------------
 ;; Org Mode Configuration ------------------------------------------------------
 ;; ----------------
@@ -189,6 +191,7 @@
 )
 
 (use-package org-bullets
+  :ensure t
   :after org
   :hook (org-mode . org-bullets-mode)
   :custom
@@ -202,6 +205,7 @@
 
 
 (use-package visual-fill-column
+  :ensure t
   :hook (org-mode . ns/org-mode-visual-fill))
 
 ;; --- END org-mode
@@ -226,6 +230,23 @@
 
 ;; org-present
 
+(defun org-present-preview-latex ()
+  "Shows equations as latex preview"
+  (interactive)
+  (custom-set-variables
+   '(org-format-latex-options
+     (quote
+      (:foreground default
+                 :background default
+                 :scale 2.0
+                 :html-foreground "Black"
+                 :html-background "Transparent"
+                 :html-scale 3.0
+                 :matchers
+                 ("begin" "$1" "$" "$$" "\\(" "\\[")))))
+  (org-toggle-latex-fragment)
+ )
+
 (autoload 'org-present "org-present" nil t)
 (eval-after-load "org-present"
   '(progn
@@ -234,7 +255,9 @@
                  (org-present-big)
                  (org-display-inline-images)
                  (org-present-hide-cursor)
-                 (org-present-read-only)))
+                 (org-present-read-only)
+                 (org-present-preview-latex)
+                 ))
      (add-hook 'org-present-mode-quit-hook
                (lambda ()
                  (org-present-small)
@@ -242,6 +265,18 @@
                  (org-present-show-cursor)
                  (org-present-read-write)))))
 
+
+;; -setting latex font size in org eq viewing
+(setq my-org-latex-preview-scale 1.5)   ; depends on the font used in emacs or just on user preference
+
+(defun org-latex-preview-advice (orig-func &rest args)
+  (let ((old-val (copy-tree org-format-latex-options)))     ; plist-put is maybe-destructive, weird. So, we have to restore old value ourselves
+    (setq org-format-latex-options (plist-put org-format-latex-options
+                                              :scale
+                                              (* my-org-latex-preview-scale (expt text-scale-mode-step text-scale-mode-amount))))
+    (apply orig-func args)
+    (setq org-format-latex-options old-val)))
+(advice-add 'org-latex-preview :around #'org-latex-preview-advice)
 
 ;; disable mouse clicking on laptop
 (require 'disable-mouse)
