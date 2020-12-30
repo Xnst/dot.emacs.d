@@ -19,11 +19,26 @@
  '(custom-enabled-themes (quote (wb2)))
  '(custom-safe-themes
    (quote
-    ("20d5d6acdc25fafd6ded585dca7f3ea5e97c98890de88ca058bedebf6ac75a30" default)))
+    ("fcfb725e0908cc1a7921fddfce8cf6835a811e5b685671a62ddc76c522723f14" default)))
  '(inhibit-startup-screen t)
  '(package-selected-packages
    (quote
-    (better-defaults company-box visual-fill-column org org-bullets sr-speedbar elpy flycheck blacken 2048-game which-key try use-package pandoc-mode pandoc markdown-mode)))
+    (better-defaults
+     company-box
+     visual-fill-column
+     org
+     org-bullets
+     sr-speedbar
+     elpy
+     flycheck
+     blacken
+     2048-game
+     which-key
+     try
+     use-package
+     pandoc-mode
+     pandoc
+     markdown-mode)))
  '(show-paren-mode t)
  '(text-mode-hook (quote (turn-on-auto-fill text-mode-hook-identify)))
  '(tool-bar-mode nil)
@@ -33,7 +48,12 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:family "Consolas" :foundry "MS  " :slant normal :weight normal :height 90 :width normal)))))
+ '(default ((t (:family "Consolas"
+                        :foundry "MS  "
+                        :slant normal
+                        :weight normal
+                        :height 90
+                        :width normal)))))
 
 ;; ---------------
 ;; --- my personal settings
@@ -143,6 +163,23 @@
 (use-package texfrag
   :ensure t)
 
+(use-package easy-hugo
+  :ensure t
+  :init
+  (setq easy-hugo-basedir "~/hugo/blog/")
+  (setq easy-hugo-url "https://blog.nist.se")
+  (setq easy-hugo-sshdomain "ns5.inleed.net")
+  (setq easy-hugo-root "public_html/blog/")
+  (setq easy-hugo-previewtime "300")
+  :bind ("C-c C-e" . easy-hugo))
+
+;; deploying hugo blog post
+(defun easy-hugo-deploy-site ()
+  "Runs the deploy command found in ~/bin."
+  (interactive)
+  (shell-command "deploy"))
+(global-set-key "\C-ce" 'easy-hugo-deploy-site)
+
 ;; ----------------
 ;; Org Mode Configuration ------------------------------------------------------
 ;; ----------------
@@ -186,7 +223,8 @@
   (setq org-ellipsis " ▾")
   (setq org-todo-keywords
   '((sequence "TODO" "DOING" "DONE")))
-
+  (setq org-todo-keyword-faces
+ '(("TODO" . "red4") ("DOING" . "magenta4") ("DONE" . "green4")))
    ;; (efs/org-font-setup)
 )
 
@@ -220,8 +258,6 @@
 (autoload 'abaqus-mode "abaqus" "Enter abaqus mode." t)
 (setq auto-mode-alist (cons '("\\.inp\\'" . abaqus-mode) auto-mode-alist))
 (add-hook 'abaqus-mode-hook 'font-lock-mode)
-
-
 
 ;; lsdyna
 (autoload 'lsdyna-mode "lsdyna" "Enter ls-dyna mode." t)
@@ -302,6 +338,79 @@
   '())
 (add-hook 'matlab-shell-mode-hook 'my-matlab-shell-mode-hook)
 
+
+;; ---
+;; ---   Nano emacs
+;; ---
+
+(add-to-list 'load-path "~/.emacs.d/nano-emacs")
+;; Window layout (optional)
+;;(require 'nano-layout)
+
+;; Theming Command line options (this will cancel warning messages)
+(add-to-list 'command-switch-alist '("-dark"   . (lambda (args))))
+(add-to-list 'command-switch-alist '("-light"  . (lambda (args))))
+(add-to-list 'command-switch-alist '("-default"  . (lambda (args))))
+
+(cond
+ ((member "-default" command-line-args) t)
+ ((member "-dark" command-line-args) (require 'nano-theme-dark))
+ (t (require 'nano-theme-light)))
+
+;; Customize support for 'emacs -q' (Optional)
+;; You can enable customizations by creating the nano-custom.el file
+;; with e.g. `touch nano-custom.el` in the folder containing this file.
+(let* ((this-file  (or load-file-name (buffer-file-name)))
+       (this-dir  (file-name-directory this-file))
+       (custom-path  (concat this-dir "nano-custom.el")))
+  (when (and (eq nil user-init-file)
+             (eq nil custom-file)
+             (file-exists-p custom-path))
+    (setq user-init-file this-file)
+    (setq custom-file custom-path)
+    (load custom-file)))
+
+;; Theme
+(require 'nano-faces)
+(nano-faces)
+
+(require 'nano-theme)
+;; (nano-theme)
+
+;; Nano default settings (optional)
+(require 'nano-defaults)
+
+;; Nano session saving (optional)
+;; (require 'nano-session)
+
+;; Nano header & mode lines (optional)
+(require 'nano-modeline)
+
+;; Nano key bindings modification (optional)
+;; (require 'nano-bindings)
+
+;; Nano counsel configuration (optional)
+;; Needs "counsel" package to be installed (M-x: package-install)
+;; (require 'nano-counsel)
+
+;; Welcome message (optional)
+(let ((inhibit-message t))
+  (message "Welcome to GNU Emacs / N Λ N O edition")
+  (message (format "Initialization time: %s" (emacs-init-time))))
+
+;; ;; Splash (optional)
+;; (add-to-list 'command-switch-alist '("-no-splash" . (lambda (args))))
+;; (unless (member "-no-splash" command-line-args)
+;;   (require 'nano-splash))
+
+;; ;; Help (optional)
+;; (add-to-list 'command-switch-alist '("-no-help" . (lambda (args))))
+;; (unless (member "-no-help" command-line-args)
+;;   (require 'nano-help))
+
+(provide 'nano)
+
+;; ---   end Nano
 
 ;; ---
 ;; ---   shortcuts for insertion of chunks of text into tex files.
