@@ -23,22 +23,7 @@
  '(inhibit-startup-screen t)
  '(package-selected-packages
    (quote
-    (better-defaults
-     company-box
-     visual-fill-column
-     org
-     org-bullets
-     sr-speedbar
-     elpy
-     flycheck
-     blacken
-     2048-game
-     which-key
-     try
-     use-package
-     pandoc-mode
-     pandoc
-     markdown-mode)))
+    (easy-hugo company-box visual-fill-column org org-bullets sr-speedbar elpy flycheck blacken 2048-game which-key try use-package pandoc-mode pandoc markdown-mode)))
  '(show-paren-mode t)
  '(text-mode-hook (quote (turn-on-auto-fill text-mode-hook-identify)))
  '(tool-bar-mode nil)
@@ -48,12 +33,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:family "Consolas"
-                        :foundry "MS  "
-                        :slant normal
-                        :weight normal
-                        :height 90
-                        :width normal)))))
+ '(default ((t (:family "Consolas" :foundry "MS  " :slant normal :weight normal :height 90 :width normal)))))
 
 ;; ---------------
 ;; --- my personal settings
@@ -160,8 +140,8 @@
 (setq speedbar-use-images nil)
 (setq sr-speedbar-refresh-turn-on t)
 
-(use-package texfrag
-  :ensure t)
+;; (use-package texfrag
+;;   :ensure t)
 
 (use-package easy-hugo
   :ensure t
