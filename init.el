@@ -100,19 +100,19 @@
   (python-shell-interpreter "python3"))
 
 
-;; (use-package company
-;;   :after elpy-mode
-;;   :hook (elpy-mode . company-mode)
-;;   :bind (:map company-active-map
-;;          ("<tab>" . company-complete-selection))
-;;         (:map elpy-mode-map
-;;          ("<tab>" . company-indent-or-complete-common))
-;;   :custom
-;;   (company-minimum-prefix-length 1)
-;;   (company-idle-delay 0.0))
+(use-package company
+  :after elpy-mode
+  :hook (elpy-mode . company-mode)
+  :bind (:map company-active-map
+         ("<tab>" . company-complete-selection))
+        (:map elpy-mode-map
+         ("<tab>" . company-indent-or-complete-common))
+  :custom
+  (company-minimum-prefix-length 1)
+  (company-idle-delay 0.0))
 
-;; (use-package company-box
-;;   :hook (company-mode . company-box-mode))
+;;(use-package company-box
+;;  :hook (company-mode . company-box-mode))
 
 ;; ---
 
@@ -148,7 +148,7 @@
   :init
   (setq easy-hugo-basedir "~/hugo/blog/")
   (setq easy-hugo-url "https://blog.nist.se")
-  (setq easy-hugo-sshdomain "ns5.inleed.net")
+  (setq easy-hugo-sshdomain "prime2.inleed.net")
   (setq easy-hugo-root "public_html/blog/")
   (setq easy-hugo-previewtime "300")
   :bind ("C-c C-e" . easy-hugo))
@@ -280,6 +280,18 @@
                  (org-remove-inline-images)
                  (org-present-show-cursor)
                  (org-present-read-write)))))
+
+
+;;(autoload 'ox-odt "ox-odt" nil t)
+
+;; company mode global
+(add-hook 'after-init-hook 'global-company-mode)
+(global-company-mode t)
+(setq company-minimum-prefix-length 1)
+(setq company-idle-delay 0)
+;; company quick-help
+(company-quickhelp-mode 1)
+(setq company-quickhelp-delay 0)
 
 
 ;; -setting latex font size in org eq viewing
