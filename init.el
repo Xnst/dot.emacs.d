@@ -1,5 +1,9 @@
 ;;; init.el --- my own emacs init.el file
 
+;; --- running emacsclient on uhura ---
+(if (string-equal (system-name) "uhura")
+    (server-start))
+
 ;;; Commentary:
 ;;
 ;;; Initialize:
@@ -16,16 +20,15 @@
    ["black" "red3" "ForestGreen" "yellow3" "blue" "magenta3" "DeepSkyBlue" "gray50"])
  '(column-number-mode t)
  '(current-language-environment "UTF-8")
- '(custom-enabled-themes (quote (wb2)))
+ '(custom-enabled-themes '(wb2))
  '(custom-safe-themes
-   (quote
-    ("fcfb725e0908cc1a7921fddfce8cf6835a811e5b685671a62ddc76c522723f14" default)))
+   '("0d556a058bd9af9dbe18fc2678830a75693f51b6b8be74ebff3cf7e8875a1272" "2a406e90ddfee681c9302303d76faaabb57a3affffb7adf3472e84115b609b27" "1feebe84eeee8f7f94b590b5109aa3aefd3d72cea5c35aa6c9636feec0bb6201" "fcfb725e0908cc1a7921fddfce8cf6835a811e5b685671a62ddc76c522723f14"))
+ '(easy-hugo-bin "/home/niclas/bin/hugo")
  '(inhibit-startup-screen t)
  '(package-selected-packages
-   (quote
-    (easy-hugo company-box visual-fill-column org org-bullets sr-speedbar elpy flycheck blacken 2048-game which-key try use-package pandoc-mode pandoc markdown-mode)))
+   '(dockerfile-mode docker sphinx-doc easy-hugo company-box visual-fill-column org org-bullets sr-speedbar elpy flycheck blacken 2048-game which-key try use-package pandoc-mode pandoc markdown-mode))
  '(show-paren-mode t)
- '(text-mode-hook (quote (turn-on-auto-fill text-mode-hook-identify)))
+ '(text-mode-hook '(turn-on-auto-fill text-mode-hook-identify))
  '(tool-bar-mode nil)
  '(tooltip-mode nil))
 (custom-set-faces
@@ -39,7 +42,7 @@
 ;; --- my personal settings
 ;; ---------------
 
-;; --- satter lite kortbindningar
+;; --- satter lite kortbindningar --------------------------
 ;; ---------------
 (global-set-key "\M-1" 'other-window)
 (global-set-key "\C-cq" 'query-replace)
@@ -51,14 +54,23 @@
 (global-set-key "\C-cd" 'delete-trailing-whitespace)
 (global-set-key "\C-cp" 'org-toggle-inline-images)
 
-;; --- tyst *scratch* buffer och inget pling
+
+;; opens the todo list in a new buffer ---------------------
+(defun niclas-open-todolist ()
+  (interactive)
+  (find-file "~/ownCloud/docs/todoStuff.org"))
+(global-set-key "\C-ct" 'niclas-open-todolist)
+
+
+;; --- tyst *scratch* buffer och inget pling ---------------
 (setq initial-scratch-message "")
 (setq ring-bell-function 'ignore)
 
+;; --- oh! the blank spaces! -------------------------------
 (add-hook 'before-save-hook
           'delete-trailing-whitespace)
 
-;; --- melpa packages settings
+;; --- melpa packages settings -----------------------------
 ;; ----------------
 (require 'package)
 ;; (setq package-enable-at-startup nil)
@@ -72,23 +84,19 @@
   (package-refresh-contents)
   (package-install 'use-package))
 
+
 ;; --- the packages
 
-;; (use-package better-defaults
-;;   :ensure t
-;;   )
-;; (menu-bar-mode t)
-
-
+;; --- simple stuff ----------------------------------------
 (use-package try
   :ensure t)
-
 
 (use-package which-key
   :ensure t
   :config (which-key-mode))
 
 
+;; --- python help stuff -----------------------------------
 (use-package elpy
   :ensure t
   :init
@@ -100,23 +108,12 @@
   (python-shell-interpreter "python3"))
 
 
-(use-package company
-  :after elpy-mode
-  :hook (elpy-mode . company-mode)
-  :bind (:map company-active-map
-         ("<tab>" . company-complete-selection))
-        (:map elpy-mode-map
-         ("<tab>" . company-indent-or-complete-common))
-  :custom
-  (company-minimum-prefix-length 1)
-  (company-idle-delay 0.0))
-
-;;(use-package company-box
-;;  :hook (company-mode . company-box-mode))
-
-;; ---
+(add-hook 'python-mode-hook (lambda ()
+                                  (require 'sphinx-doc)
+                                  (sphinx-doc-mode t)))
 
 
+;; --- markdown and pandoc ---------------------------------
 (use-package markdown-mode
   :ensure t
   :mode (("README\\.md\\'" . gfm-mode)
@@ -127,12 +124,11 @@
 
 (use-package pandoc
   :ensure t)
-
-
 (use-package pandoc-mode
   :ensure t)
 
 
+;; --- the fantastic speedbar ------------------------------
 (use-package sr-speedbar
   :ensure t)
 ;;(require 'sr-speedbar)
@@ -140,13 +136,12 @@
 (setq speedbar-use-images nil)
 (setq sr-speedbar-refresh-turn-on t)
 
-;; (use-package texfrag
-;;   :ensure t)
 
+;; --- hugo!! ----------------------------------------------
 (use-package easy-hugo
   :ensure t
   :init
-  (setq easy-hugo-basedir "~/hugo/blog/")
+  (setq easy-hugo-basedir "/home/niclas/hugo/blog/")
   (setq easy-hugo-url "https://blog.nist.se")
   (setq easy-hugo-sshdomain "prime2.inleed.net")
   (setq easy-hugo-root "public_html/blog/")
@@ -158,10 +153,26 @@
   "Runs the deploy command found in ~/bin."
   (interactive)
   (shell-command "deploy"))
+;; (add-hook 'markdown-mode
+;; 	  (lambda () (local-set-key "\C-ce"
+;; 	  'easy-hugo-deploy-site)))
 (global-set-key "\C-ce" 'easy-hugo-deploy-site)
 
+
+;; --- auctex stuff ----------------------------------------
+(use-package tex
+  :defer t
+  :ensure auctex
+  :config
+  (setq TeX-auto-save t))
+
+;; ---------------
+;; --- docker stuff ----------------------------------------
+;; ---------------
+(use-package dockerfile-mode
+  :ensure t)
 ;; ----------------
-;; Org Mode Configuration ------------------------------------------------------
+;; Org Mode Configuration ----------------------------------
 ;; ----------------
 
 (defun ns/org-mode-setup ()
@@ -204,7 +215,7 @@
   (setq org-todo-keywords
   '((sequence "TODO" "DOING" "DONE")))
   (setq org-todo-keyword-faces
- '(("TODO" . "red4") ("DOING" . "magenta4") ("DONE" . "green4")))
+ '(("TODO" . "red3") ("DOING" . "magenta3") ("DONE" . "green3")))
    ;; (efs/org-font-setup)
 )
 
@@ -226,25 +237,87 @@
   :ensure t
   :hook (org-mode . ns/org-mode-visual-fill))
 
+
+
+;; --- org-eq-viewer ---
+;; -setting latex font size in org eq viewing ---
+(setq my-org-latex-preview-scale 1.5)
+
+; plist-put is maybe-destructive, weird. So, we have to restore old value ourselves
+(defun org-latex-preview-advice (orig-func &rest args)
+  (let ((old-val (copy-tree org-format-latex-options)))
+    (setq org-format-latex-options (plist-put org-format-latex-options
+                                              :scale
+                                              (* my-org-latex-preview-scale (expt text-scale-mode-step text-scale-mode-amount))))
+    (apply orig-func args)
+    (setq org-format-latex-options old-val)))
+(advice-add 'org-latex-preview :around #'org-latex-preview-advice)
+
 ;; --- END org-mode
 
+;; --- company stuff ---------------------------------------
+(use-package company
+  :after elpy-mode
+  :hook (elpy-mode . company-mode)
+  :bind (:map company-active-map
+         ("<tab>" . company-complete-selection))
+        (:map elpy-mode-map
+         ("<tab>" . company-indent-or-complete-common))
+  :custom
+  (company-minimum-prefix-length 1)
+  (company-idle-delay 0.0)
+  )
+
+
+;; ;; --- some colors for company mode when dark
+;; (require 'color)
+
+;; (custom-theme-set-variables
+;;  ;; company-mode
+;;  ;;
+;;  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;  '(company-tooltip                  ((t (:inherit nil :background "grey23" :foreground "white")))))
+
+
+ ;; (let ((bg (face-attribute 'default :background)))
+ ;;    (custom-set-faces
+ ;;     `(company-tooltip ((t (:inherit default :background ,(color-lighten-name bg 2)))))
+ ;;     `(company-scrollbar-bg ((t (:background ,(color-lighten-name bg 10)))))
+ ;;     `(company-scrollbar-fg ((t (:background ,(color-lighten-name bg 5)))))
+ ;;     `(company-tooltip-selection ((t (:inherit font-lock-function-name-face))))
+ ;;     `(company-tooltip-common ((t (:inherit font-lock-constant-face))))))
+
+;; company mode global
+(add-hook 'after-init-hook 'global-company-mode)
+(global-company-mode t)
+(setq company-minimum-prefix-length 1)
+(setq company-idle-delay 0)
+;; company quick-help
+;; (company-quickhelp-mode 1)
+;; (setq company-quickhelp-delay 0)
+
+;; ---
+
+;; (use-package company-box
+;;   :hook (company-mode . company-box-mode))
+
 
 ;; ----------------
-;; --- init for lisp-files in ~/.emacs.d/lisp
+;; --- init for lisp-files in ~/.emacs.d/lisp --------------
 ;; ----------------
-(add-to-list 'load-path "~/.emacs.d/lisp/")
+(add-to-list 'load-path "/home/niclas/.emacs.d/lisp/")
 
-;; abaqus
+;; --- abaqus ---
 (autoload 'abaqus-mode "abaqus" "Enter abaqus mode." t)
 (setq auto-mode-alist (cons '("\\.inp\\'" . abaqus-mode) auto-mode-alist))
 (add-hook 'abaqus-mode-hook 'font-lock-mode)
 
-;; lsdyna
+;; --- lsdyna ---
 (autoload 'lsdyna-mode "lsdyna" "Enter ls-dyna mode." t)
 (setq auto-mode-alist (cons '("\\.k\\'" . lsdyna-mode) auto-mode-alist))
 (add-hook 'lsdyna-mode-hook 'font-lock-mode)
 
-;; org-present
+;; org-present ---
 
 (defun org-present-preview-latex ()
   "Shows equations as latex preview"
@@ -282,37 +355,13 @@
                  (org-present-read-write)))))
 
 
-;;(autoload 'ox-odt "ox-odt" nil t)
-
-;; company mode global
-(add-hook 'after-init-hook 'global-company-mode)
-(global-company-mode t)
-(setq company-minimum-prefix-length 1)
-(setq company-idle-delay 0)
-;; company quick-help
-(company-quickhelp-mode 1)
-(setq company-quickhelp-delay 0)
-
-
-;; -setting latex font size in org eq viewing
-(setq my-org-latex-preview-scale 1.5)   ; depends on the font used in emacs or just on user preference
-
-(defun org-latex-preview-advice (orig-func &rest args)
-  (let ((old-val (copy-tree org-format-latex-options)))     ; plist-put is maybe-destructive, weird. So, we have to restore old value ourselves
-    (setq org-format-latex-options (plist-put org-format-latex-options
-                                              :scale
-                                              (* my-org-latex-preview-scale (expt text-scale-mode-step text-scale-mode-amount))))
-    (apply orig-func args)
-    (setq org-format-latex-options old-val)))
-(advice-add 'org-latex-preview :around #'org-latex-preview-advice)
-
-;; disable mouse clicking on laptop
+;; --- disable mouse clicking on laptop ---
 (require 'disable-mouse)
 (if (string-equal (system-name) "niclap")
     (global-disable-mouse-mode))
 
 
-;; octave uses matlab.el
+;; --- make octave to use matlab.el ---
 (setq auto-mode-alist (remq '("\\.m\\'" . objc-mode) auto-mode-alist))
 (autoload 'matlab-mode "matlab" "Enter MATLAB mode." t)
 (setq auto-mode-alist (cons '("\\.m\\'" . matlab-mode) auto-mode-alist))
@@ -321,6 +370,7 @@
        shell-command-echoes nil)
 (setq matlab-shell-command-switches '("--no-gui"))
 (setq matlab-shell-buffer-name "octave")
+
 ;; (defalias 'octave-shell 'matlab-shell)
 (setq matlab-verify-on-save-flag nil) ; turn off auto-verify on save
 (defun my-matlab-mode-hook ()
@@ -330,79 +380,7 @@
   '())
 (add-hook 'matlab-shell-mode-hook 'my-matlab-shell-mode-hook)
 
-
-;; ---
-;; ---   Nano emacs
-;; ---
-
-;; (add-to-list 'load-path "~/.emacs.d/nano-emacs")
-;; ;; Window layout (optional)
-;; ;;(require 'nano-layout)
-
-;; ;; Theming Command line options (this will cancel warning messages)
-;; (add-to-list 'command-switch-alist '("-dark"   . (lambda (args))))
-;; (add-to-list 'command-switch-alist '("-light"  . (lambda (args))))
-;; (add-to-list 'command-switch-alist '("-default"  . (lambda (args))))
-
-;; (cond
-;;  ((member "-default" command-line-args) t)
-;;  ((member "-dark" command-line-args) (require 'nano-theme-dark))
-;;  (t (require 'nano-theme-light)))
-
-;; ;; Customize support for 'emacs -q' (Optional)
-;; ;; You can enable customizations by creating the nano-custom.el file
-;; ;; with e.g. `touch nano-custom.el` in the folder containing this file.
-;; (let* ((this-file  (or load-file-name (buffer-file-name)))
-;;        (this-dir  (file-name-directory this-file))
-;;        (custom-path  (concat this-dir "nano-custom.el")))
-;;   (when (and (eq nil user-init-file)
-;;              (eq nil custom-file)
-;;              (file-exists-p custom-path))
-;;     (setq user-init-file this-file)
-;;     (setq custom-file custom-path)
-;;     (load custom-file)))
-
-;; ;; Theme
-;; (require 'nano-faces)
-;; (nano-faces)
-
-;; (require 'nano-theme)
-;; ;; (nano-theme)
-
-;; ;; Nano default settings (optional)
-;; (require 'nano-defaults)
-
-;; ;; Nano session saving (optional)
-;; ;; (require 'nano-session)
-
-;; ;; Nano header & mode lines (optional)
-;; (require 'nano-modeline)
-
-;; ;; Nano key bindings modification (optional)
-;; ;; (require 'nano-bindings)
-
-;; ;; Nano counsel configuration (optional)
-;; ;; Needs "counsel" package to be installed (M-x: package-install)
-;; ;; (require 'nano-counsel)
-
-;; ;; Welcome message (optional)
-;; (let ((inhibit-message t))
-;;   (message "Welcome to GNU Emacs / N Λ N O edition")
-;;   (message (format "Initialization time: %s" (emacs-init-time))))
-
-;; ;; ;; Splash (optional)
-;; ;; (add-to-list 'command-switch-alist '("-no-splash" . (lambda (args))))
-;; ;; (unless (member "-no-splash" command-line-args)
-;; ;;   (require 'nano-splash))
-
-;; ;; ;; Help (optional)
-;; ;; (add-to-list 'command-switch-alist '("-no-help" . (lambda (args))))
-;; ;; (unless (member "-no-help" command-line-args)
-;; ;;   (require 'nano-help))
-
-;; (provide 'nano)
-
-;; ;; ---   end Nano
+;; ---------------------------------------------------------
 
 ;; ---
 ;; ---   shortcuts for insertion of chunks of text into tex files.
@@ -453,7 +431,7 @@
 
 
 ;; ---
-;; --- insertion of basic html text
+;; --- insertion of basic html text ------------------------
 ;; ---
 
 (defun insert-html-basic-start()
@@ -463,7 +441,8 @@
   "<!DOCTYPE html>
 <html>
   <head>
-  <meta charset=\"utf-8\">
+    <meta charset=\"utf-8\">
+    <link rel=\"stylesheet\" href=\"\">
   <title></title>
   </head>
   <body>
@@ -472,7 +451,7 @@
 </html>
 "
   )
-  (backward-char 19))
+  (backward-char 59))
 
 ;; ---
 ;; ---
