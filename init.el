@@ -26,7 +26,7 @@
  '(easy-hugo-bin "/home/niclas/bin/hugo")
  '(inhibit-startup-screen t)
  '(package-selected-packages
-   '(dockerfile-mode docker sphinx-doc easy-hugo company-box visual-fill-column org org-bullets sr-speedbar elpy flycheck blacken 2048-game which-key try use-package pandoc-mode pandoc markdown-mode))
+   '(magit edit-server auctex dockerfile-mode docker sphinx-doc easy-hugo company-box visual-fill-column org org-bullets sr-speedbar elpy flycheck blacken 2048-game which-key try use-package pandoc-mode pandoc markdown-mode))
  '(show-paren-mode t)
  '(text-mode-hook '(turn-on-auto-fill text-mode-hook-identify))
  '(tool-bar-mode nil)
@@ -56,10 +56,10 @@
 
 
 ;; opens the todo list in a new buffer ---------------------
-(defun niclas-open-todolist ()
+(defun nst-open-todolist ()
   (interactive)
   (find-file "~/ownCloud/docs/todoStuff.org"))
-(global-set-key "\C-ct" 'niclas-open-todolist)
+(global-set-key "\C-ct" 'nst-open-todolist)
 
 
 ;; --- tyst *scratch* buffer och inget pling ---------------
@@ -122,6 +122,11 @@
   :init (setq markdown-command "multimarkdown"))
 (add-hook 'markdown-mode-hook 'pandoc-mode)
 
+(defun nst-disable-company-mode()
+  (company-mode -1))
+(add-hook 'markdown-mode-hook 'nst-disable-company-mode)
+
+
 (use-package pandoc
   :ensure t)
 (use-package pandoc-mode
@@ -171,6 +176,13 @@
 ;; ---------------
 (use-package dockerfile-mode
   :ensure t)
+
+
+;; --- magit ---
+(use-package magit
+  :ensure t)
+
+
 ;; ----------------
 ;; Org Mode Configuration ----------------------------------
 ;; ----------------
@@ -235,7 +247,9 @@
 
 (use-package visual-fill-column
   :ensure t
-  :hook (org-mode . ns/org-mode-visual-fill))
+  :hook ((org-mode . ns/org-mode-visual-fill)
+        (markdown-mode . ns/org-mode-visual-fill))
+  )
 
 
 
@@ -296,11 +310,33 @@
 ;; (company-quickhelp-mode 1)
 ;; (setq company-quickhelp-delay 0)
 
+
+; Use tab key to cycle through suggestions.
+; ('tng' means 'tab and go')
+; (company-tng-configure-default)
 ;; ---
 
 ;; (use-package company-box
 ;;   :hook (company-mode . company-box-mode))
 
+
+
+(use-package edit-server
+  :ensure t
+  :commands edit-server-start
+  :init (if after-init-time
+              (edit-server-start)
+            (add-hook 'after-init-hook
+                      #'(lambda() (edit-server-start))))
+  :config (setq edit-server-new-frame-alist
+                '((name . "Edit with Emacs FRAME")
+                  (top . 200)
+                  (left . 200)
+                  (width . 80)
+                  (height . 25)
+                  (minibuffer . t)
+                  (menu-bar-lines . t)
+                  (window-system . x))))
 
 ;; ----------------
 ;; --- init for lisp-files in ~/.emacs.d/lisp --------------
@@ -316,6 +352,7 @@
 (autoload 'lsdyna-mode "lsdyna" "Enter ls-dyna mode." t)
 (setq auto-mode-alist (cons '("\\.k\\'" . lsdyna-mode) auto-mode-alist))
 (add-hook 'lsdyna-mode-hook 'font-lock-mode)
+
 
 ;; org-present ---
 
